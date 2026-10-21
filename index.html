@@ -1,0 +1,795 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)} body{margin:0} img{max-width:100%}</style>
+<title>Ronan Dsouza Film Archive</title>
+<meta name="description" content="Film photographs by Ronan Dsouza, roll by roll. Free to view and download.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a lab-log index of rolls (one row per roll, grouped by year) that opens into a contact sheet per roll; single frames open in a dark loupe. */
+:root{
+  --paper:#F2F2EF;
+  --surface:#FFFFFF;
+  --sunk:#E6E4DF;
+  --ink:#171614;
+  --muted:#6C675F;
+  --line:#D8D5CE;
+  --accent:#A94F17;      /* film-base orange */
+  --accent-ink:#FFFFFF;
+  --display:"Archivo","Arial Narrow",Helvetica,Arial,sans-serif;
+  --body:"Archivo",Helvetica,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --step--1:.8125rem; --step-0:1rem; --step-1:1.25rem; --step-2:1.75rem; --step-3:clamp(2.25rem,6vw,4.25rem);
+  --wrap:1180px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#121110; --surface:#1A1917; --sunk:#201F1C; --ink:#ECE9E3; --muted:#958F86;
+    --line:#2C2A27; --accent:#E8914A; --accent-ink:#1A1208; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#121110; --surface:#1A1917; --sunk:#201F1C; --ink:#ECE9E3; --muted:#958F86;
+  --line:#2C2A27; --accent:#E8914A; --accent-ink:#1A1208; color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:var(--body); font-size:var(--step-0); line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+.mono{font-family:var(--mono);font-size:var(--step--1);letter-spacing:.02em}
+.wrap{
+  max-width:var(--wrap); margin-inline:auto;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+
+/* ---------- Header / wordmark ---------- */
+.top{padding-block:22px 18px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap}
+.brand{display:inline-flex; align-items:center; gap:12px; text-decoration:none}
+.brand svg{width:38px; height:27px; flex:none; color:var(--ink)}
+.brand .word{display:flex; flex-direction:column; line-height:1}
+.brand b{
+  font-family:var(--display); font-weight:780; font-stretch:125%;
+  font-size:1.0625rem; letter-spacing:.06em; text-transform:uppercase;
+}
+.brand small{font-family:var(--mono); font-size:.6875rem; color:var(--muted); letter-spacing:.14em; text-transform:uppercase; margin-top:5px}
+.top .meta{color:var(--muted); text-transform:uppercase; letter-spacing:.1em; font-size:.6875rem}
+
+.demo{
+  display:flex; gap:10px; align-items:baseline; flex-wrap:wrap;
+  border:1px dashed var(--line); border-radius:6px; padding:10px 14px; margin-bottom:8px;
+  color:var(--muted); font-size:var(--step--1);
+}
+.demo strong{color:var(--accent); font-family:var(--mono); font-weight:500; text-transform:uppercase; letter-spacing:.1em; font-size:.6875rem}
+
+/* ---------- Home ---------- */
+.intro{padding-block:48px 28px; display:grid; gap:18px}
+.rule{height:1px; background:var(--ink); border:0; margin:0}
+.intro h1{
+  font-family:var(--display); font-weight:300; font-stretch:112%;
+  font-size:var(--step-3); line-height:1.02; letter-spacing:-.02em; margin:0; max-width:16ch; text-wrap:balance;
+}
+.intro h1 em{font-style:normal; font-weight:760; font-stretch:125%}
+.intro p{margin:0; max-width:56ch; color:var(--muted)}
+.stats{display:flex; gap:22px; flex-wrap:wrap; text-transform:uppercase; letter-spacing:.1em; color:var(--ink); font-size:.75rem}
+.stats span b{font-weight:500; color:var(--accent)}
+
+.filters{display:flex; gap:8px; flex-wrap:wrap; padding-block:18px}
+.chip{
+  border:1px solid var(--line); background:transparent; border-radius:999px;
+  padding:5px 12px; font-size:var(--step--1); cursor:pointer; white-space:nowrap;
+}
+.chip:hover{border-color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--ink); color:var(--paper); border-color:var(--ink)}
+.chip .n{font-family:var(--mono); font-size:.6875rem; opacity:.6; margin-left:4px}
+
+.year{margin-top:18px}
+.year h2{
+  display:flex; align-items:baseline; justify-content:space-between; gap:12px;
+  font-family:var(--display); font-weight:760; font-stretch:125%; font-size:var(--step-1);
+  margin:0; padding-block:14px 10px; border-bottom:1px solid var(--line);
+  position:sticky; top:env(safe-area-inset-top,0px); background:var(--paper); z-index:2;
+}
+.year h2 span{font-family:var(--mono); font-weight:400; font-stretch:100%; font-size:.75rem; color:var(--muted); letter-spacing:.06em}
+.rolls{list-style:none; margin:0; padding:0}
+.roll{
+  display:grid; align-items:baseline; gap:4px 20px; text-decoration:none;
+  grid-template-columns:4.5rem 4.5rem minmax(0,1fr) 7.5rem 10rem 3.5rem 1.25rem;
+  grid-template-areas:"no date film iso cam fr go";
+  padding-block:15px; border-bottom:1px solid var(--line);
+  transition:background-color .15s;
+}
+.roll:hover{background:var(--sunk)}
+.roll > *{min-width:0}
+.r-no{grid-area:no; font-family:var(--mono); font-size:var(--step--1); color:var(--muted); padding-left:6px; font-variant-numeric:tabular-nums}
+.r-date{grid-area:date; font-family:var(--mono); font-size:var(--step--1); font-variant-numeric:tabular-nums}
+.r-film{grid-area:film; font-weight:600; font-size:var(--step-1); line-height:1.25; letter-spacing:-.005em}
+.r-film em{display:block; font-style:normal; font-weight:400; font-size:var(--step--1); color:var(--muted); margin-top:2px; letter-spacing:0}
+.r-iso{grid-area:iso; font-family:var(--mono); font-size:var(--step--1); white-space:nowrap}
+.r-cam{grid-area:cam; font-size:var(--step--1); color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.r-fr{grid-area:fr; font-family:var(--mono); font-size:var(--step--1); color:var(--muted); text-align:right; font-variant-numeric:tabular-nums}
+.r-go{grid-area:go; color:var(--muted); transition:transform .2s, color .2s}
+.roll:hover .r-go{transform:translateX(3px); color:var(--accent)}
+.r-thumb{display:none; grid-area:thumb}
+.push{font-style:normal; color:var(--accent); margin-left:6px; font-size:.6875rem; border:1px solid currentColor; border-radius:3px; padding:0 4px}
+.empty{padding-block:40px; color:var(--muted)}
+
+/* floating cover preview on hover (desktop) */
+#peek{
+  position:fixed; left:0; top:0; width:280px; aspect-ratio:3/2; z-index:20; pointer-events:none;
+  background:var(--sunk); border-radius:3px; overflow:hidden;
+  box-shadow:0 18px 40px -12px rgba(0,0,0,.35);
+  opacity:0; transform:translate(-9999px,0); transition:opacity .15s;
+}
+#peek.on{opacity:1}
+#peek img{width:100%; height:100%; object-fit:cover; display:block}
+
+@media (max-width:760px){
+  .roll{
+    grid-template-columns:72px auto auto minmax(0,1fr);
+    grid-template-areas:"thumb film film film" "thumb date iso fr";
+    align-items:center; gap:4px 14px; padding-block:12px;
+  }
+  .r-no,.r-cam,.r-go{display:none}
+  .r-thumb{display:block; width:72px; aspect-ratio:3/2; background:var(--sunk); border-radius:2px; overflow:hidden; align-self:center}
+  .r-thumb img{width:100%; height:100%; object-fit:cover; display:block}
+  .r-film{font-size:var(--step-0)}
+  .r-fr{text-align:left}
+  .roll:hover{background:transparent}
+  #peek{display:none}
+}
+
+/* ---------- Roll / contact sheet ---------- */
+.back{display:inline-flex; gap:8px; align-items:center; text-decoration:none; color:var(--muted); font-size:var(--step--1); padding-block:18px 0}
+.back:hover{color:var(--ink)}
+.roll-head{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:20px 40px; align-items:end; padding-block:22px 26px}
+.eyebrow{color:var(--muted); text-transform:uppercase; letter-spacing:.12em; font-size:.75rem; margin:0 0 10px}
+.stock{
+  font-family:var(--display); font-weight:780; font-stretch:125%;
+  font-size:var(--step-3); line-height:.98; letter-spacing:-.015em; margin:0; text-wrap:balance;
+}
+.roll-title{margin:12px 0 0; font-size:var(--step-1); color:var(--muted); font-weight:300}
+.specs{display:flex; gap:28px; flex-wrap:wrap; margin:22px 0 0}
+.specs div{display:grid; gap:2px}
+.specs dt{font-family:var(--mono); font-size:.6875rem; text-transform:uppercase; letter-spacing:.12em; color:var(--muted)}
+.specs dd{margin:0; font-weight:600}
+.actions{display:flex; flex-direction:column; gap:8px; align-items:stretch; min-width:220px}
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding:11px 18px; border-radius:4px; border:1px solid var(--ink);
+  text-decoration:none; font-weight:600; font-size:var(--step--1); cursor:pointer; background:transparent;
+}
+.btn.primary{background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
+.btn:hover{filter:brightness(1.06)}
+.btn:not(.primary):hover{background:var(--sunk)}
+.hint{font-size:.75rem; color:var(--muted); max-width:30ch; margin:2px 0 0}
+
+.edge{
+  font-family:var(--mono); font-size:.6875rem; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--accent); white-space:nowrap; overflow:hidden; padding-block:8px;
+  border-top:1px solid var(--ink); border-bottom:1px solid var(--line);
+}
+.sheet{
+  list-style:none; margin:0; padding:22px 0 0;
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:26px 18px;
+}
+.sheet li{display:grid; gap:7px; min-width:0}
+.frame{
+  display:block; width:100%; padding:0; border:0; cursor:zoom-in; background:var(--sunk);
+  aspect-ratio:3/2; max-width:100%; border-radius:2px; overflow:hidden; position:relative;
+}
+.frame img{width:100%; height:100%; object-fit:contain; display:block; opacity:0; transition:opacity .35s}
+.frame img.in{opacity:1}
+.frame .err{position:absolute; inset:0; display:grid; place-items:center; font-size:.75rem; color:var(--muted); padding:12px; text-align:center}
+.cap{display:flex; justify-content:space-between; align-items:baseline; font-family:var(--mono); font-size:.75rem; color:var(--muted)}
+.cap b{font-weight:500; color:var(--ink); font-variant-numeric:tabular-nums}
+.cap a{text-decoration:none; color:var(--muted)}
+.cap a:hover{color:var(--accent); text-decoration:underline}
+.roll-nav{display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; padding-block:48px 8px; margin-top:48px; border-top:1px solid var(--line)}
+.roll-nav a{text-decoration:none; display:grid; gap:2px; max-width:48%}
+.roll-nav a:last-child{text-align:right; margin-left:auto}
+.roll-nav small{font-family:var(--mono); font-size:.6875rem; color:var(--muted); text-transform:uppercase; letter-spacing:.12em}
+.roll-nav span{font-weight:600}
+.roll-nav a:hover span{color:var(--accent)}
+
+@media (max-width:760px){
+  .roll-head{grid-template-columns:1fr}
+  .actions{min-width:0}
+  .sheet{grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px 10px}
+}
+
+/* ---------- Loupe (single-frame viewer): always dark, by design ---------- */
+#loupe{
+  position:fixed; inset:0; z-index:50; background:#0D0C0B; color:#EDEAE4;
+  display:grid; grid-template-rows:auto minmax(0,1fr) auto;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+.l-bar{
+  display:flex; justify-content:space-between; align-items:center; gap:12px;
+  padding-block:12px; padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+.l-bar .mono{color:#A39D93; text-transform:uppercase; letter-spacing:.12em; font-size:.6875rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0}
+.l-bar .mono b{color:#EDEAE4; font-weight:500}
+.l-actions{display:flex; gap:8px; flex:none}
+.l-btn{
+  display:inline-flex; align-items:center; gap:6px; background:transparent; color:#EDEAE4;
+  border:1px solid #3A3733; border-radius:4px; padding:8px 12px; font-size:.8125rem; font-weight:600;
+  text-decoration:none; cursor:pointer;
+}
+.l-btn:hover{border-color:#EDEAE4}
+.l-btn.dl{background:#E8914A; border-color:#E8914A; color:#1A1208}
+.l-stage{position:relative; display:grid; place-items:center; min-height:0; padding:0 56px; touch-action:pan-y}
+.l-stage img{max-width:100%; max-height:100%; object-fit:contain; display:block; user-select:none; -webkit-user-drag:none}
+.l-nav{
+  position:absolute; top:50%; transform:translateY(-50%); width:44px; height:64px;
+  background:transparent; border:0; color:#EDEAE4; cursor:pointer; font-size:1.5rem; opacity:.6;
+}
+.l-nav:hover{opacity:1}
+.l-prev{left:max(4px,env(safe-area-inset-left,0px))}
+.l-next{right:max(4px,env(safe-area-inset-right,0px))}
+.l-foot{text-align:center; padding-block:10px 14px; font-family:var(--mono); font-size:.6875rem; color:#7D776E; letter-spacing:.12em; text-transform:uppercase}
+@media (max-width:600px){ .l-stage{padding:0 8px} .l-nav{display:none} .l-btn .t{display:none} }
+
+.toast{
+  position:fixed; left:50%; bottom:calc(20px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%);
+  background:var(--ink); color:var(--paper); padding:10px 16px; border-radius:6px; font-size:var(--step--1);
+  z-index:60; max-width:calc(100% - 32px); box-shadow:0 10px 30px -10px rgba(0,0,0,.4);
+}
+
+footer{padding-block:56px 40px; color:var(--muted); font-size:var(--step--1); display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap}
+
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important; animation:none!important}
+}
+</style>
+
+</head>
+<body>
+<header class="wrap top">
+  <a class="brand" href="#" aria-label="Ronan Dsouza, film archive home">
+    <svg viewBox="0 0 38 27" aria-hidden="true">
+      <rect x="0" y="0" width="38" height="27" rx="2.5" fill="currentColor"/>
+      <g fill="var(--paper)">
+        <rect x="3" y="2" width="3" height="2.4" rx=".6"/><rect x="10" y="2" width="3" height="2.4" rx=".6"/><rect x="17.5" y="2" width="3" height="2.4" rx=".6"/><rect x="25" y="2" width="3" height="2.4" rx=".6"/><rect x="32" y="2" width="3" height="2.4" rx=".6"/>
+        <rect x="3" y="22.6" width="3" height="2.4" rx=".6"/><rect x="10" y="22.6" width="3" height="2.4" rx=".6"/><rect x="17.5" y="22.6" width="3" height="2.4" rx=".6"/><rect x="25" y="22.6" width="3" height="2.4" rx=".6"/><rect x="32" y="22.6" width="3" height="2.4" rx=".6"/>
+        <rect x="3" y="6.5" width="32" height="14" rx="1"/>
+      </g>
+      <text x="19" y="17.6" text-anchor="middle" fill="currentColor"
+        style="font-family:Archivo,Helvetica,Arial,sans-serif;font-weight:800;font-stretch:125%;font-size:10px;letter-spacing:.4px">RD</text>
+    </svg>
+    <span class="word"><b>Ronan Dsouza</b><small>Film archive · 35mm</small></span>
+  </a>
+  <span class="mono meta" id="topMeta"></span>
+</header>
+
+<div class="wrap" id="demoNote" hidden>
+  <p class="demo"><strong>Preview</strong> These are generated sample frames. Your scans from Google Drive appear here once the data link is added.</p>
+</div>
+
+<main id="view"></main>
+
+<div id="peek" aria-hidden="true"><img alt=""></div>
+
+<div id="loupe" hidden role="dialog" aria-modal="true" aria-label="Photo viewer">
+  <div class="l-bar">
+    <span class="mono" id="lInfo"></span>
+    <span class="l-actions">
+      <a class="l-btn dl" id="lDl" href="#" target="_blank" rel="noopener"><span aria-hidden="true">↓</span><span class="t">Download</span></a>
+      <button class="l-btn" id="lClose" type="button" aria-label="Close viewer">✕<span class="t">Close</span></button>
+    </span>
+  </div>
+  <div class="l-stage" id="lStage">
+    <button class="l-nav l-prev" id="lPrev" type="button" aria-label="Previous frame">←</button>
+    <img id="lImg" alt="">
+    <button class="l-nav l-next" id="lNext" type="button" aria-label="Next frame">→</button>
+  </div>
+  <div class="l-foot">← → to browse · Esc to close</div>
+</div>
+
+<footer class="wrap">
+  <span>Photographs © <span id="yr"></span> Ronan Dsouza. Shot on film, scanned, shared in full resolution.</span>
+  <span class="mono" id="updated"></span>
+</footer>
+
+<script>
+/* =========================================================
+   SETTINGS
+   Paste the web app URL from Google Apps Script between the quotes.
+   Leave it empty to see the design with sample frames.
+   ========================================================= */
+const CONFIG = {
+  DATA_URL: "https://script.google.com/macros/s/AKfycbw_zHrsd62yF9FhWs0REwGaVoH2rHY40odksK13EtoCVsiMdKX2z85GD7iXdP4W_S0/exec"
+};
+
+/* ---------- Google Drive URLs ---------- */
+const drive = {
+  thumb: (id, w) => `https://lh3.googleusercontent.com/d/${id}=w${w}`,
+  thumbAlt: (id, w) => `https://drive.google.com/thumbnail?id=${id}&sz=w${w}`,
+  download: id => `https://drive.google.com/uc?export=download&id=${id}`,
+  folder: id => `https://drive.google.com/drive/folders/${id}`
+};
+
+/* ---------- State ---------- */
+let ROLLS = [];
+let DEMO = false;
+let filter = "All";
+let current = null;     // roll being viewed
+let loupeIndex = 0;
+let homeScroll = 0;
+
+const $ = s => document.querySelector(s);
+const view = $("#view");
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const MONTHS_L = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const pad = n => String(n).padStart(2, "0");
+
+function parseDate(s){
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s || "");
+  return m ? {y:+m[1], m:+m[2]-1, d:+m[3]} : null;
+}
+function shortDate(s){ const d = parseDate(s); return d ? `${pad(d.d)} ${MONTHS[d.m]}` : "—"; }
+function longDate(s){ const d = parseDate(s); return d ? `${d.d} ${MONTHS_L[d.m]} ${d.y}` : "Date unknown"; }
+
+/* Box speed from the film name, so pushed or pulled rolls can be marked. */
+function pushStops(film, iso){
+  const speeds = [25,50,64,80,100,125,160,200,250,320,400,500,800,1600,3200];
+  const found = [...String(film).matchAll(/(?<!\d)(\d{2,4})(?!\d)/g)].map(m => +m[1]).filter(n => speeds.includes(n));
+  const box = found[found.length - 1], i = parseFloat(iso);
+  if (!box || !i) return 0;
+  return Math.round(Math.log2(i / box));
+}
+function pushLabel(stops){
+  if (!stops) return "";
+  return `<i class="push" title="${stops > 0 ? "Pushed" : "Pulled"} ${Math.abs(stops)} stop${Math.abs(stops) > 1 ? "s" : ""}">${stops > 0 ? "+" : "−"}${Math.abs(stops)}</i>`;
+}
+
+/* ---------- Data ---------- */
+async function loadData(){
+  if (!CONFIG.DATA_URL) { DEMO = true; return demoData(); }
+  try {
+    const res = await fetch(CONFIG.DATA_URL, {redirect:"follow"});
+    if (!res.ok) throw new Error(res.status);
+    return await res.json();
+  } catch (e) {
+    return await jsonp(CONFIG.DATA_URL);
+  }
+}
+function jsonp(url){
+  return new Promise((resolve, reject) => {
+    const cb = "__rolls" + Date.now();
+    const s = document.createElement("script");
+    const t = setTimeout(() => { cleanup(); reject(new Error("timeout")); }, 15000);
+    function cleanup(){ clearTimeout(t); delete window[cb]; s.remove(); }
+    window[cb] = data => { cleanup(); resolve(data); };
+    s.onerror = () => { cleanup(); reject(new Error("load failed")); };
+    s.src = url + (url.includes("?") ? "&" : "?") + "callback=" + cb;
+    document.head.appendChild(s);
+  });
+}
+function normalise(data){
+  const rolls = (data.rolls || []).filter(r => r && r.photos && r.photos.length);
+  rolls.sort((a, b) => (a.date || "").localeCompare(b.date || ""));
+  rolls.forEach((r, i) => {
+    r.no = i + 1;
+    r.year = (parseDate(r.date) || {}).y || "Undated";
+    r.cover = r.cover || r.photos[0].id;
+  });
+  return rolls.reverse();  // newest first
+}
+
+/* ---------- Image loading ---------- */
+const io = "IntersectionObserver" in window ? new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { io.unobserve(e.target); fill(e.target); } });
+}, {rootMargin:"600px 0px"}) : null;
+
+/* An <img> carries data-id and data-w; this puts the right source on it. */
+function fill(img){
+  const id = img.dataset.id, w = +img.dataset.w;
+  img.onload = () => img.classList.add("in");
+  if (DEMO) { img.src = demoImage(id, w); return; }
+  img.onerror = () => {
+    if (!img.dataset.retry) { img.dataset.retry = 1; img.src = drive.thumbAlt(id, w); }
+    else {
+      img.onerror = null;
+      const box = img.parentElement;
+      if (box && !box.querySelector(".err")) box.insertAdjacentHTML("beforeend", `<span class="err">Couldn't load this frame. Check the roll's folder is shared publicly.</span>`);
+    }
+  };
+  img.src = drive.thumb(id, w);
+}
+function lazy(img, eager){
+  if (eager || !io) fill(img); else io.observe(img);
+}
+
+/* ---------- Home ---------- */
+function renderHome(){
+  current = null;
+  const frames = ROLLS.reduce((n, r) => n + r.photos.length, 0);
+  const years = ROLLS.map(r => r.year).filter(y => typeof y === "number");
+  const span = years.length ? (Math.min(...years) === Math.max(...years) ? Math.max(...years) : `${Math.min(...years)}–${Math.max(...years)}`) : "";
+  $("#topMeta").textContent = span ? `${ROLLS.length} rolls · ${span}` : "";
+
+  const stocks = {};
+  ROLLS.forEach(r => { const k = r.film || "Unknown film"; stocks[k] = (stocks[k] || 0) + 1; });
+  const stockList = Object.entries(stocks).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+  if (filter !== "All" && !stocks[filter]) filter = "All";
+  const shown = ROLLS.filter(r => filter === "All" || (r.film || "Unknown film") === filter);
+
+  const byYear = [];
+  shown.forEach(r => {
+    let g = byYear.find(x => x.year === r.year);
+    if (!g) byYear.push(g = {year:r.year, rolls:[]});
+    g.rolls.push(r);
+  });
+
+  view.innerHTML = `
+    <section class="wrap intro">
+      <h1>Every roll, <em>frame by frame.</em></h1>
+      <p>Photographs I've shot on film, scanned and kept in one place. Open a roll to see the full contact sheet and download any frame at full resolution. No account needed.</p>
+      <div class="stats mono">
+        <span><b>${ROLLS.length}</b> rolls</span>
+        <span><b>${frames}</b> frames</span>
+        <span><b>${stockList.length}</b> film stocks</span>
+      </div>
+    </section>
+    <div class="wrap">
+      <hr class="rule">
+      <div class="filters" role="group" aria-label="Filter by film stock">
+        <button class="chip" type="button" data-f="All" aria-pressed="${filter === "All"}">All<span class="n">${ROLLS.length}</span></button>
+        ${stockList.map(([k, n]) => `<button class="chip" type="button" data-f="${esc(k)}" aria-pressed="${filter === k}">${esc(k)}<span class="n">${n}</span></button>`).join("")}
+      </div>
+      ${byYear.length ? byYear.map(g => `
+        <section class="year">
+          <h2>${esc(g.year)}<span>${g.rolls.length} roll${g.rolls.length > 1 ? "s" : ""}</span></h2>
+          <ol class="rolls">
+            ${g.rolls.map(r => `
+              <li><a class="roll" href="#roll-${esc(r.id)}" data-id="${esc(r.id)}">
+                <span class="r-thumb"><img alt="" data-id="${esc(r.cover)}" data-w="200" decoding="async"></span>
+                <span class="r-no">No.&nbsp;${pad(r.no)}</span>
+                <span class="r-date">${shortDate(r.date)}</span>
+                <span class="r-film">${esc(r.film || "Unknown film")}${r.title ? `<em>${esc(r.title)}</em>` : ""}</span>
+                <span class="r-iso">${r.iso ? `ISO ${esc(r.iso)}${pushLabel(pushStops(r.film, r.iso))}` : ""}</span>
+                <span class="r-cam">${esc(r.camera)}</span>
+                <span class="r-fr">${r.photos.length} fr</span>
+                <span class="r-go" aria-hidden="true">→</span>
+              </a></li>`).join("")}
+          </ol>
+        </section>`).join("") : `<p class="empty">No rolls to show yet.</p>`}
+    </div>`;
+
+  view.querySelectorAll(".chip").forEach(b => b.addEventListener("click", () => {
+    filter = b.dataset.f; renderHome();
+  }));
+  const mobile = matchMedia("(max-width:760px)").matches;
+  view.querySelectorAll(".r-thumb img").forEach((img, i) => { if (mobile) lazy(img, i < 8); });
+  view.querySelectorAll(".roll").forEach(a => {
+    a.addEventListener("mouseenter", () => showPeek(a.dataset.id));
+    a.addEventListener("mouseleave", hidePeek);
+  });
+}
+
+/* hover preview of a roll's cover */
+const peek = $("#peek"), peekImg = peek.querySelector("img");
+let peekOn = false;
+function showPeek(id){
+  if (!matchMedia("(hover:hover) and (pointer:fine) and (min-width:761px)").matches) return;
+  const r = ROLLS.find(x => x.id === id); if (!r) return;
+  peekImg.classList.remove("in");
+  peekImg.dataset.id = r.cover; peekImg.dataset.w = 600; peekImg.dataset.retry = "";
+  fill(peekImg);
+  peek.classList.add("on"); peekOn = true;
+}
+function hidePeek(){ peek.classList.remove("on"); peekOn = false; }
+document.addEventListener("mousemove", e => {
+  if (!peekOn) return;
+  const w = 280, h = w * 2 / 3;
+  let x = e.clientX + 28, y = e.clientY - h / 2;
+  if (x + w > innerWidth - 16) x = e.clientX - w - 28;
+  y = Math.max(12, Math.min(innerHeight - h - 12, y));
+  peek.style.transform = `translate(${x}px,${y}px)`;
+});
+
+/* ---------- Roll (contact sheet) ---------- */
+function renderRoll(r){
+  current = r;
+  hidePeek();
+  const idx = ROLLS.indexOf(r);
+  const newer = ROLLS[idx - 1], older = ROLLS[idx + 1];
+  const stops = pushStops(r.film, r.iso);
+  const filmUp = (r.film || "Film").toUpperCase();
+  let edge = "";
+  for (let i = 1; i <= Math.max(r.photos.length, 24); i++) edge += `${i} ▸ ${i}A ▸ ${i % 6 === 1 ? filmUp + " ▸ " : ""}`;
+
+  view.innerHTML = `
+    <div class="wrap">
+      <a class="back" href="#"><span aria-hidden="true">←</span> All rolls</a>
+      <header class="roll-head">
+        <div>
+          <p class="eyebrow mono">Roll No. ${pad(r.no)} · ${longDate(r.date)}</p>
+          <h1 class="stock">${esc(r.film || "Unknown film")}</h1>
+          ${r.title ? `<p class="roll-title">${esc(r.title)}</p>` : ""}
+          <dl class="specs">
+            ${r.iso ? `<div><dt>Shot at</dt><dd>ISO ${esc(r.iso)}${stops ? ` <span class="mono" style="color:var(--accent)">${stops > 0 ? "push +" : "pull −"}${Math.abs(stops)}</span>` : ""}</dd></div>` : ""}
+            ${r.camera ? `<div><dt>Camera</dt><dd>${esc(r.camera)}</dd></div>` : ""}
+            <div><dt>Frames</dt><dd>${r.photos.length}</dd></div>
+          </dl>
+        </div>
+        <div class="actions">
+          ${r.zip
+            ? `<a class="btn primary" href="${DEMO ? "#" : drive.download(r.zip)}" target="_blank" rel="noopener" data-demo-dl>↓ Download whole roll</a>
+               <a class="btn" href="${DEMO ? "#" : drive.folder(r.id)}" target="_blank" rel="noopener" data-demo-dl>Open in Google Drive</a>`
+            : `<a class="btn primary" href="${DEMO ? "#" : drive.folder(r.id)}" target="_blank" rel="noopener" data-demo-dl>↓ Download whole roll</a>
+               <p class="hint">Opens the roll in Google Drive. Use Drive's Download button to get every frame as one zip.</p>`}
+        </div>
+      </header>
+      <div class="edge" aria-hidden="true">${esc(edge)}</div>
+      <ol class="sheet">
+        ${r.photos.map((p, i) => `
+          <li>
+            <button class="frame" type="button" data-i="${i}" aria-label="Open frame ${i + 1}">
+              <img alt="Frame ${i + 1}, ${esc(r.film)}" data-id="${esc(p.id)}" data-w="640" decoding="async" loading="lazy">
+            </button>
+            <div class="cap"><b>${pad(i + 1)}</b><a href="${DEMO ? "#" : drive.download(p.id)}" target="_blank" rel="noopener" data-demo-dl>Download</a></div>
+          </li>`).join("")}
+      </ol>
+      <nav class="roll-nav" aria-label="More rolls">
+        ${older ? `<a href="#roll-${esc(older.id)}"><small>← Previous roll · ${shortDate(older.date)} ${older.year}</small><span>${esc(older.film)}</span></a>` : "<span></span>"}
+        ${newer ? `<a href="#roll-${esc(newer.id)}"><small>Next roll · ${shortDate(newer.date)} ${newer.year} →</small><span>${esc(newer.film)}</span></a>` : ""}
+      </nav>
+    </div>`;
+
+  view.querySelectorAll(".sheet img").forEach((img, i) => lazy(img, i < 8));
+  view.querySelectorAll(".frame").forEach(b => b.addEventListener("click", () => openLoupe(+b.dataset.i, b)));
+  bindDemoLinks(view);
+}
+
+/* ---------- Loupe ---------- */
+const loupe = $("#loupe"), lImg = $("#lImg");
+let lastFocus = null;
+function openLoupe(i, from){
+  lastFocus = from || document.activeElement;
+  loupe.hidden = false;
+  document.documentElement.style.overflow = "hidden";
+  showFrame(i);
+  $("#lClose").focus();
+}
+function closeLoupe(){
+  loupe.hidden = true;
+  document.documentElement.style.overflow = "";
+  lImg.removeAttribute("src");
+  if (lastFocus) lastFocus.focus();
+}
+function showFrame(i){
+  const r = current; if (!r) return;
+  const n = r.photos.length;
+  loupeIndex = (i + n) % n;
+  const p = r.photos[loupeIndex];
+  $("#lInfo").innerHTML = `<b>${pad(loupeIndex + 1)}</b> / ${pad(n)} · ${esc(r.film)} · ${shortDate(r.date)} ${esc(r.year)}`;
+  const dl = $("#lDl");
+  dl.href = DEMO ? "#" : drive.download(p.id);
+  lImg.alt = `Frame ${loupeIndex + 1}, ${r.film}`;
+  // show the cached small version first, then swap in the large one
+  const small = DEMO ? demoImage(p.id, 640) : drive.thumb(p.id, 640);
+  lImg.src = small;
+  const bigUrl = DEMO ? null : drive.thumb(p.id, 2000);
+  if (DEMO) {
+    requestAnimationFrame(() => { if (r.photos[loupeIndex] === p) lImg.src = demoImage(p.id, 1600); });
+  } else {
+    const big = new Image();
+    big.onload = () => { if (r.photos[loupeIndex] === p) lImg.src = bigUrl; };
+    big.onerror = () => {
+      const alt = drive.thumbAlt(p.id, 2000);
+      const b2 = new Image(); b2.onload = () => { if (r.photos[loupeIndex] === p) lImg.src = alt; }; b2.src = alt;
+    };
+    big.src = bigUrl;
+    // warm the neighbours
+    [1, -1].forEach(d => { const q = r.photos[(loupeIndex + d + n) % n]; new Image().src = drive.thumb(q.id, 2000); });
+  }
+}
+$("#lClose").addEventListener("click", closeLoupe);
+$("#lPrev").addEventListener("click", () => showFrame(loupeIndex - 1));
+$("#lNext").addEventListener("click", () => showFrame(loupeIndex + 1));
+$("#lDl").addEventListener("click", e => { if (DEMO) { e.preventDefault(); demoToast(); } });
+document.addEventListener("keydown", e => {
+  if (loupe.hidden) return;
+  if (e.key === "Escape") closeLoupe();
+  else if (e.key === "ArrowRight") showFrame(loupeIndex + 1);
+  else if (e.key === "ArrowLeft") showFrame(loupeIndex - 1);
+  else if (e.key === "Tab") { // keep focus inside the viewer
+    const f = [...loupe.querySelectorAll("a,button")].filter(x => x.offsetParent);
+    const first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }
+});
+let sx = null;
+$("#lStage").addEventListener("pointerdown", e => { sx = e.clientX; });
+$("#lStage").addEventListener("pointerup", e => {
+  if (sx === null) return;
+  const dx = e.clientX - sx; sx = null;
+  if (Math.abs(dx) > 50) showFrame(loupeIndex + (dx < 0 ? 1 : -1));
+});
+
+/* ---------- Routing (#roll-ID) ---------- */
+function route(){
+  if (!loupe.hidden) closeLoupe();
+  routeTo(location.hash);
+}
+document.addEventListener("click", e => {
+  const a = e.target.closest('a[href^="#"]');
+  if (!a || a.target === "_blank") return;
+  const h = a.getAttribute("href");
+  e.preventDefault();
+  try { if (location.hash !== h) history.pushState(null, "", h === "#" ? location.pathname + location.search : h); } catch (_) {}
+  routeTo(h);
+});
+function routeTo(h){
+  const m = /^#roll-([\w.~-]+)$/.exec(h);
+  const r = m && ROLLS.find(x => x.id === m[1]);
+  if (r) { if (!current) homeScroll = scrollY; renderRoll(r); scrollTo(0, 0); }
+  else { const was = !!current; renderHome(); if (was) requestAnimationFrame(() => scrollTo(0, homeScroll)); }
+}
+addEventListener("popstate", route);
+addEventListener("hashchange", route);
+
+/* ---------- Demo helpers ---------- */
+let toastEl = null, toastT = null;
+function demoToast(){
+  if (!toastEl) { toastEl = document.createElement("div"); toastEl.className = "toast"; toastEl.setAttribute("role", "status"); document.body.appendChild(toastEl); }
+  toastEl.textContent = "Sample frame. Downloads link to Google Drive once your rolls are connected.";
+  toastEl.hidden = false;
+  clearTimeout(toastT); toastT = setTimeout(() => toastEl.hidden = true, 3200);
+}
+function bindDemoLinks(root){
+  if (!DEMO) return;
+  root.querySelectorAll("[data-demo-dl]").forEach(a => a.addEventListener("click", e => { e.preventDefault(); e.stopPropagation(); demoToast(); }));
+}
+
+function demoData(){
+  const stocks = [
+    ["Kodak Portra 400","portra"],["Kodak Portra 160","portra"],["Kodak Ektar 100","ektar"],["Kodak Gold 200","gold"],
+    ["Ilford HP5 Plus 400","bw"],["Kodak Tri-X 400","bw"],["CineStill 800T","cine"],["Fujifilm Superia X-TRA 400","fuji"],
+    ["Ilford Delta 3200","bw"],["Kodak ColorPlus 200","gold"]
+  ];
+  const cams = ["Nikon FM2","Olympus OM-1","Canon AE-1 Program","Contax T2","Pentax K1000"];
+  const titles = ["Coastal walk","Night tram","Market morning","Rain in the city","Back roads","Harbour at dusk","Weekend away","Old town","Sunday swim","Winter light","Late shift","Long weekend","Bus window","Ferry crossing","Rooftops","The garden","Fog","Neon","Salt and sand","Road trip","Studio days","Last light"];
+  const rand = rng(7);
+  const rolls = [];
+  let t = Date.UTC(2024, 2, 9);
+  for (let i = 0; i < 22; i++) {
+    const [film, look] = stocks[Math.floor(rand() * stocks.length)];
+    let iso = (film.match(/(\d{2,4})(?!.*\d)/) || [,"400"])[1];
+    if (look === "bw" && rand() < .4) iso = String(+iso * 4 > 3200 ? 3200 : +iso * 4);
+    const n = 24 + Math.floor(rand() * 14);
+    const d = new Date(t);
+    const id = `demo${i}`;
+    rolls.push({
+      id, film, iso, camera: cams[Math.floor(rand() * cams.length)], title: titles[i],
+      date: `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`,
+      look, zip: i % 3 === 0 ? "demo-zip" : "",
+      photos: Array.from({length:n}, (_, k) => ({id:`${id}f${k}`}))
+    });
+    t += (22 + Math.floor(rand() * 40)) * 864e5;
+  }
+  DEMO_LOOK = Object.fromEntries(rolls.map(r => [r.id, {look:r.look, iso:+r.iso}]));
+  return {updated: new Date().toISOString(), rolls};
+}
+let DEMO_LOOK = {};
+
+function rng(seed){ let a = seed >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function hash(s){ let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
+
+/* Generates a believable film-like frame: sky, sun, hills, grain, vignette, stock tint. */
+const demoCache = new Map();
+function demoImage(id, w){
+  const key = id + "@" + w;
+  if (demoCache.has(key)) return demoCache.get(key);
+  const roll = id.replace(/f\d+$/, "");
+  const {look = "portra", iso = 400} = DEMO_LOOK[roll] || {};
+  const R = rng(hash(id));
+  const portrait = R() < .22;
+  const W = portrait ? Math.round(w * 2 / 3) : w, H = portrait ? w : Math.round(w * 2 / 3);
+  const c = document.createElement("canvas"); c.width = W; c.height = H;
+  const g = c.getContext("2d");
+  const night = look === "cine" ? R() < .8 : R() < .12;
+  const golden = !night && R() < .45;
+  const hue = 190 + R() * 30;
+  const sky = g.createLinearGradient(0, 0, 0, H);
+  if (night) { sky.addColorStop(0, `hsl(${hue+20} 45% 8%)`); sky.addColorStop(1, `hsl(${hue} 40% 22%)`); }
+  else if (golden) { sky.addColorStop(0, `hsl(${hue} 45% 62%)`); sky.addColorStop(.7, `hsl(${30 + R()*15} 75% 72%)`); sky.addColorStop(1, `hsl(${20 + R()*10} 80% 66%)`); }
+  else { sky.addColorStop(0, `hsl(${hue} 55% ${48 + R()*12}%)`); sky.addColorStop(1, `hsl(${hue - 10} 40% 84%)`); }
+  g.fillStyle = sky; g.fillRect(0, 0, W, H);
+  const hz = H * (.45 + R() * .25);
+  // sun or moon
+  const sxp = W * (.15 + R() * .7), syp = hz - H * (.05 + R() * .25), sr = Math.max(W, H) * (.04 + R() * .05);
+  const glow = g.createRadialGradient(sxp, syp, 0, sxp, syp, sr * 6);
+  glow.addColorStop(0, night ? "rgba(255,240,220,.9)" : "rgba(255,248,225,1)");
+  glow.addColorStop(.18, night ? "rgba(255,220,180,.25)" : "rgba(255,226,170,.55)");
+  glow.addColorStop(1, "rgba(255,220,170,0)");
+  g.fillStyle = glow; g.fillRect(0, 0, W, H);
+  // land layers
+  const layers = 2 + Math.floor(R() * 3);
+  for (let L = 0; L < layers; L++) {
+    const base = hz + (H - hz) * (L / layers) * .8;
+    const amp = H * (.05 + R() * .12) * (1 - L / (layers + 1));
+    const light = night ? 6 + L * 3 : golden ? 30 - L * 7 : 38 - L * 8;
+    g.fillStyle = `hsl(${golden ? 25 + L * 6 : 100 + R() * 80} ${night ? 20 : 25 + R() * 20}% ${Math.max(6, light)}%)`;
+    g.beginPath(); g.moveTo(0, H);
+    let y = base - amp * R();
+    for (let x = 0; x <= W; x += W / 24) { y += (R() - .5) * amp * .5; y = Math.min(base + amp, Math.max(base - amp, y)); g.lineTo(x, y); }
+    g.lineTo(W, H); g.closePath(); g.fill();
+  }
+  // a few verticals: poles, trees, buildings
+  const posts = Math.floor(R() * 6);
+  g.fillStyle = night ? "rgba(5,5,8,.9)" : "rgba(20,18,16,.75)";
+  for (let k = 0; k < posts; k++) {
+    const x = R() * W, pw = W * (.004 + R() * .03), ph = H * (.15 + R() * .5);
+    g.fillRect(x, hz + H * .1 - ph, pw, ph + H);
+  }
+  if (night) { // street lights with halation
+    for (let k = 0; k < 6 + R() * 10; k++) {
+      const x = R() * W, y = hz - R() * H * .25 + H * .1, r = W * (.004 + R() * .006);
+      const hg = g.createRadialGradient(x, y, 0, x, y, r * 9);
+      hg.addColorStop(0, "rgba(255,245,225,1)"); hg.addColorStop(.15, "rgba(255,120,70,.55)"); hg.addColorStop(1, "rgba(255,60,40,0)");
+      g.fillStyle = hg; g.fillRect(x - r * 9, y - r * 9, r * 18, r * 18);
+    }
+  }
+  // film look, grain and vignette
+  const img = g.getImageData(0, 0, W, H), d = img.data;
+  const grain = Math.min(34, 6 + iso / 90) * (W > 900 ? 1 : .8);
+  const cx = W / 2, cy = H / 2, md = Math.hypot(cx, cy);
+  let seed = hash(id) || 1;
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const i = (y * W + x) * 4;
+    let r = d[i], gg = d[i + 1], b = d[i + 2];
+    seed ^= seed << 13; seed ^= seed >>> 17; seed ^= seed << 5;
+    const n = ((seed >>> 0) / 4294967296 - .5) * grain;
+    if (look === "bw") { let l = .3 * r + .59 * gg + .11 * b; l = (l - 128) * 1.25 + 128; r = gg = b = l; }
+    else {
+      const l = (r + gg + b) / 3;
+      let s = look === "ektar" ? 1.3 : look === "portra" ? .85 : look === "cine" ? 1 : 1.05;
+      r = l + (r - l) * s; gg = l + (gg - l) * s; b = l + (b - l) * s;
+      if (look === "portra") { r = r * .96 + 14; gg = gg * .96 + 9; b = b * .92 + 6; }
+      else if (look === "gold") { r += 14; gg += 7; b -= 12; }
+      else if (look === "fuji") { gg += 8; b += 4; r -= 4; }
+      else if (look === "cine") { b += (255 - l) * .06; r -= 4; }
+    }
+    const v = 1 - Math.pow(Math.hypot(x - cx, y - cy) / md, 2.2) * .45;
+    d[i] = (r + n) * v; d[i + 1] = (gg + n) * v; d[i + 2] = (b + n) * v;
+  }
+  g.putImageData(img, 0, 0);
+  const url = c.toDataURL("image/jpeg", .82);
+  demoCache.set(key, url);
+  return url;
+}
+
+/* ---------- Start ---------- */
+$("#yr").textContent = new Date().getFullYear();
+view.innerHTML = `<p class="wrap empty mono">Loading rolls…</p>`;
+loadData().then(data => {
+  ROLLS = normalise(data);
+  $("#demoNote").hidden = !DEMO;
+  if (data.updated && !DEMO) {
+    const u = new Date(data.updated);
+    $("#updated").textContent = `Updated ${u.getDate()} ${MONTHS[u.getMonth()]} ${u.getFullYear()}`;
+  }
+  route();
+}).catch(() => {
+  view.innerHTML = `<div class="wrap"><p class="empty">The rolls couldn't be loaded. Check that the Apps Script web app is deployed with access set to "Anyone", and that its URL in this page's settings is correct.</p></div>`;
+});
+</script>
+
+</body>
+</html>
