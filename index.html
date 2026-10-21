@@ -207,11 +207,11 @@ button{font:inherit;color:inherit}
 .cs-bar h2{margin:0; font-family:var(--mono); font-weight:500; font-size:.75rem; letter-spacing:.14em; text-transform:uppercase}
 .cs-bar h2 span{color:var(--muted); font-weight:400}
 .cs-img{
-  display:block; width:100%; max-width:100%; padding:0; border:0; cursor:zoom-in;
-  background:var(--sunk); border-radius:2px; overflow:hidden; position:relative; min-height:220px;
+  display:block; width:min(100%,560px); max-width:100%; padding:0; border:0; cursor:zoom-in;
+  background:var(--sunk); border-radius:2px; overflow:hidden; position:relative; min-height:200px;
 }
-.cs-img img{display:block; width:auto; max-width:100%; height:auto; max-height:88vh; margin-inline:auto; opacity:0; transition:opacity .35s}
-.cs-img:has(img.in){background:transparent; min-height:0; aspect-ratio:auto!important}
+.cs-img img{display:block; width:auto; max-width:100%; height:auto; max-height:min(52vh,440px); opacity:0; transition:opacity .35s}
+.cs-img:has(img.in){background:transparent; min-height:0; width:fit-content; aspect-ratio:auto!important}
 .cs-img img.in{opacity:1}
 .cs-img .err{position:absolute; inset:0; display:grid; place-items:center; font-size:.75rem; color:var(--muted); padding:12px; text-align:center}
 
@@ -267,6 +267,7 @@ button{font:inherit;color:inherit}
   .sheet{--rh:112px; --gap:3px; margin-inline:-12px; padding-top:12px}
   .fn{left:4px; bottom:4px; font-size:.625rem; padding:3px 5px}
   .cs-img{min-height:140px}
+  .cs-img img{max-height:44vh}
   .roll-head{padding-block:14px 24px}
   .stock{font-size:clamp(2rem,9vw,2.6rem)}
   .roll-title{font-size:var(--step-0)}
@@ -299,8 +300,9 @@ button{font:inherit;color:inherit}
 }
 .l-btn:hover{border-color:#EDEAE4}
 .l-btn.dl{background:#E8914A; border-color:#E8914A; color:#1A1208}
-.l-stage{position:relative; display:grid; place-items:center; min-height:0; padding:0 56px; touch-action:pan-y pinch-zoom}
-.l-stage img{max-width:100%; max-height:100%; object-fit:contain; display:block; user-select:none; -webkit-user-drag:none}
+.l-stage{position:relative; min-height:0; overflow:hidden; touch-action:pan-y pinch-zoom}
+.l-stage img{position:absolute; top:0; bottom:0; left:56px; right:56px; width:calc(100% - 112px); height:100%; object-fit:contain; object-position:center; display:block; user-select:none; -webkit-user-drag:none}
+.l-nav{z-index:1}
 .l-nav{
   position:absolute; top:50%; transform:translateY(-50%); width:44px; height:64px;
   background:transparent; border:0; color:#EDEAE4; cursor:pointer; font-size:1.5rem; opacity:.6;
@@ -309,7 +311,7 @@ button{font:inherit;color:inherit}
 .l-prev{left:max(4px,env(safe-area-inset-left,0px))}
 .l-next{right:max(4px,env(safe-area-inset-right,0px))}
 .l-foot{text-align:center; padding-block:10px 14px; font-family:var(--mono); font-size:.6875rem; color:#7D776E; letter-spacing:.12em; text-transform:uppercase}
-@media (max-width:600px){ .l-stage{padding:0} .l-bar .mono .lf{display:none} .l-nav{display:none} .l-btn .t{display:none} }
+@media (max-width:600px){ .l-stage img{left:0; right:0; width:100%} .l-bar .mono .lf{display:none} .l-nav{display:none} .l-btn .t{display:none} }
 
 .toast{
   position:fixed; left:50%; bottom:calc(20px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%);
