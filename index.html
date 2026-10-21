@@ -156,7 +156,20 @@ button{font:inherit;color:inherit}
   .r-no,.r-cam{display:none}
   .r-film{font-size:var(--step-0)}
   .r-fr{text-align:left}
-  .roll:hover{background:transparent}
+}
+@media (hover:none){ .roll:hover{background:transparent} .roll:hover .r-go{transform:none} }
+@media (max-width:760px){
+  .intro{padding-block:26px 20px; gap:14px}
+  .stats{gap:14px}
+  .filters{flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch;
+    margin-inline:-16px; padding-inline:16px; padding-block:14px}
+  .filters::-webkit-scrollbar{display:none}
+  .chip{flex:none; padding:7px 14px}
+  .filters .lbl{flex:none}
+  .back{padding-block:12px 4px; min-height:44px}
+  .demo{font-size:.75rem; padding:8px 12px}
+  .top{padding-block:16px 14px}
+  footer{flex-direction:column; padding-block:40px 28px}
 }
 
 /* ---------- Roll page ---------- */
@@ -202,7 +215,7 @@ button{font:inherit;color:inherit}
 .cs-img img.in{opacity:1}
 .cs-img .err{position:absolute; inset:0; display:grid; place-items:center; font-size:.75rem; color:var(--muted); padding:12px; text-align:center}
 
-.frames-head{display:flex; justify-content:space-between; align-items:baseline; gap:12px; margin-bottom:0}
+.frames-head{display:flex; justify-content:space-between; align-items:baseline; gap:4px 12px; flex-wrap:wrap; margin-bottom:0}
 .frames-head h2{margin:0; font-family:var(--mono); font-weight:500; font-size:.75rem; letter-spacing:.14em; text-transform:uppercase; padding-block:14px 0}
 .edge{
   font-family:var(--mono); font-size:.6875rem; letter-spacing:.18em; text-transform:uppercase;
@@ -211,21 +224,36 @@ button{font:inherit;color:inherit}
 }
 .frames{border-top:1px solid var(--ink)}
 .sheet{
-  list-style:none; margin:0; padding:22px 0 0;
-  display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:26px 18px;
+  --rh:210px; --gap:6px;
+  list-style:none; margin:0; padding:16px 0 0;
+  display:flex; flex-wrap:wrap; gap:var(--gap);
 }
-.sheet li{display:grid; gap:7px; min-width:0}
+.sheet::after{content:""; flex-grow:100000; height:0}
+.sheet li{position:relative; min-width:0; flex-grow:150; flex-basis:calc(1.5 * var(--rh))}
 .frame{
   display:block; width:100%; padding:0; border:0; cursor:zoom-in; background:var(--sunk);
-  aspect-ratio:3/2; max-width:100%; border-radius:2px; overflow:hidden; position:relative;
+  aspect-ratio:3/2; max-width:100%; border-radius:1px; overflow:hidden; position:relative;
 }
-.frame img{width:100%; height:100%; object-fit:contain; display:block; opacity:0; transition:opacity .35s}
+.frame img{width:100%; height:100%; object-fit:cover; display:block; opacity:0; transition:opacity .35s}
 .frame img.in{opacity:1}
 .frame .err{position:absolute; inset:0; display:grid; place-items:center; font-size:.75rem; color:var(--muted); padding:12px; text-align:center}
-.cap{display:flex; justify-content:space-between; align-items:baseline; font-family:var(--mono); font-size:.75rem; color:var(--muted)}
-.cap b{font-weight:500; color:var(--ink); font-variant-numeric:tabular-nums}
-.cap a{text-decoration:none; color:var(--muted)}
-.cap a:hover{color:var(--accent); text-decoration:underline}
+/* overlays sit on the photo itself, so they use fixed light-on-dark colours in both themes */
+.fn{
+  position:absolute; left:6px; bottom:6px; pointer-events:none;
+  font-family:var(--mono); font-size:.6875rem; font-weight:500; line-height:1; letter-spacing:.04em;
+  font-variant-numeric:tabular-nums; color:#F4F1EC; background:rgba(12,11,10,.58);
+  padding:4px 6px; border-radius:3px;
+}
+.fdl{
+  position:absolute; right:6px; top:6px; width:32px; height:32px; display:grid; place-items:center;
+  border-radius:50%; background:rgba(12,11,10,.58); color:#F4F1EC; text-decoration:none;
+  opacity:0; transition:opacity .15s;
+}
+.fdl svg{width:15px; height:15px}
+.fdl:hover{background:#E8914A; color:#1A1208}
+.sheet li:hover .fdl, .fdl:focus-visible{opacity:1}
+@media (hover:none){ .fdl{display:none} }
+.frames-head .tip{font-family:var(--mono); font-size:.6875rem; color:var(--muted); letter-spacing:.06em}
 .roll-nav{display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; padding-block:48px 8px; margin-top:48px; border-top:1px solid var(--line)}
 .roll-nav a{text-decoration:none; display:grid; gap:2px; max-width:48%}
 .roll-nav a:last-child{text-align:right; margin-left:auto}
@@ -236,14 +264,25 @@ button{font:inherit;color:inherit}
 @media (max-width:760px){
   .roll-head{grid-template-columns:1fr}
   .actions{min-width:0}
-  .sheet{grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px 10px}
+  .sheet{--rh:112px; --gap:3px; margin-inline:-12px; padding-top:12px}
+  .fn{left:4px; bottom:4px; font-size:.625rem; padding:3px 5px}
   .cs-img{min-height:140px}
+  .roll-head{padding-block:14px 24px}
+  .stock{font-size:clamp(2rem,9vw,2.6rem)}
+  .roll-title{font-size:var(--step-0)}
+  .desc{font-size:1rem}
+  .specs{gap:20px}
+  .btn{padding-block:13px}
+  .cs{padding-bottom:28px}
+  .roll-nav{flex-direction:column; padding-block:28px 0; margin-top:32px}
+  .roll-nav a{max-width:100%}
+  .roll-nav a:last-child{text-align:left; margin-left:0}
 }
 
 /* ---------- Loupe (single-frame viewer): always dark, by design ---------- */
 #loupe{
   position:fixed; inset:0; z-index:50; background:#0D0C0B; color:#EDEAE4;
-  display:grid; grid-template-rows:auto minmax(0,1fr) auto;
+  display:grid; grid-template-rows:auto minmax(0,1fr) auto; grid-template-columns:minmax(0,1fr);
   padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
 .l-bar{
@@ -260,7 +299,7 @@ button{font:inherit;color:inherit}
 }
 .l-btn:hover{border-color:#EDEAE4}
 .l-btn.dl{background:#E8914A; border-color:#E8914A; color:#1A1208}
-.l-stage{position:relative; display:grid; place-items:center; min-height:0; padding:0 56px; touch-action:pan-y}
+.l-stage{position:relative; display:grid; place-items:center; min-height:0; padding:0 56px; touch-action:pan-y pinch-zoom}
 .l-stage img{max-width:100%; max-height:100%; object-fit:contain; display:block; user-select:none; -webkit-user-drag:none}
 .l-nav{
   position:absolute; top:50%; transform:translateY(-50%); width:44px; height:64px;
@@ -270,7 +309,7 @@ button{font:inherit;color:inherit}
 .l-prev{left:max(4px,env(safe-area-inset-left,0px))}
 .l-next{right:max(4px,env(safe-area-inset-right,0px))}
 .l-foot{text-align:center; padding-block:10px 14px; font-family:var(--mono); font-size:.6875rem; color:#7D776E; letter-spacing:.12em; text-transform:uppercase}
-@media (max-width:600px){ .l-stage{padding:0 8px} .l-nav{display:none} .l-btn .t{display:none} }
+@media (max-width:600px){ .l-stage{padding:0} .l-bar .mono .lf{display:none} .l-nav{display:none} .l-btn .t{display:none} }
 
 .toast{
   position:fixed; left:50%; bottom:calc(20px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%);
@@ -591,15 +630,18 @@ function renderRoll(r){
 
       ${r.photos.length ? `
       <section class="frames" aria-labelledby="frTitle">
-        <div class="frames-head"><h2 id="frTitle">Frames <span style="color:var(--muted);font-weight:400">· ${r.photos.length}</span></h2></div>
+        <div class="frames-head"><h2 id="frTitle">Frames <span style="color:var(--muted);font-weight:400">· ${r.photos.length}</span></h2><span class="tip">${matchMedia("(hover:none)").matches ? "Tap" : "Click"} a frame to view or download</span></div>
         <div class="edge" aria-hidden="true">${esc(edge)}</div>
         <ol class="sheet">
           ${r.photos.map((p, i) => `
-            <li>
-              <button class="frame" type="button" data-i="${i}" aria-label="Open frame ${i + 1}">
+            <li style="${ratioStyle(ratioOf(p))}">
+              <button class="frame" type="button" data-i="${i}" aria-label="Open frame ${i + 1}" style="aspect-ratio:${ratioOf(p).toFixed(4)}">
                 <img alt="Frame ${i + 1}, ${esc(r.film)}" data-id="${esc(p.id)}" data-w="640" decoding="async" loading="lazy">
               </button>
-              <div class="cap"><b>${pad(i + 1)}</b><a href="${link(drive.download(p.id))}" target="_blank" rel="noopener" data-demo-dl>Download</a></div>
+              <span class="fn" aria-hidden="true">${pad(i + 1)}</span>
+              <a class="fdl" href="${link(drive.download(p.id))}" target="_blank" rel="noopener" data-demo-dl aria-label="Download frame ${i + 1}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>
+              </a>
             </li>`).join("")}
         </ol>
       </section>` : ""}
@@ -613,10 +655,24 @@ function renderRoll(r){
   const csImg = view.querySelector(".cs-img img");
   if (csImg) lazy(csImg, true);
   $("#csOpen")?.addEventListener("click", e => openLoupe(0, e.currentTarget, "contact"));
-  view.querySelectorAll(".sheet img").forEach((img, i) => lazy(img, i < (c ? 4 : 8)));
+  view.querySelectorAll(".sheet img").forEach((img, i) => {
+    // once a frame loads, fit its tile to the photo's real shape (no cropping)
+    img.addEventListener("load", () => {
+      if (!img.naturalWidth || !img.naturalHeight) return;
+      const ratio = img.naturalWidth / img.naturalHeight;
+      const li = img.closest("li");
+      li.style.cssText = ratioStyle(ratio);
+      img.parentElement.style.aspectRatio = ratio.toFixed(4);
+    });
+    lazy(img, i < (c ? 6 : 12));
+  });
   view.querySelectorAll(".frame").forEach(b => b.addEventListener("click", () => openLoupe(+b.dataset.i, b, "frames")));
   bindDemoLinks(view);
 }
+
+/* Justified photo wall: each tile grows in proportion to its photo's width/height. */
+function ratioOf(p){ return p.w && p.h ? p.w / p.h : 1.5; }
+function ratioStyle(r){ return `flex-grow:${(r * 100).toFixed(2)};flex-basis:calc(${r.toFixed(4)} * var(--rh))`; }
 
 /* ---------- Loupe ---------- */
 const loupe = $("#loupe"), lImg = $("#lImg");
@@ -626,7 +682,8 @@ function openLoupe(i, from, mode){
   loupeMode = mode;
   const single = mode === "contact" || current.photos.length < 2;
   $("#lPrev").hidden = $("#lNext").hidden = single;
-  $("#lFoot").textContent = single ? "Esc to close" : "← → to browse · Esc to close";
+  const touch = matchMedia("(hover:none)").matches;
+  $("#lFoot").textContent = single ? (touch ? "Pinch to zoom" : "Esc to close") : (touch ? "Swipe to browse" : "← → to browse · Esc to close");
   loupe.hidden = false;
   document.documentElement.style.overflow = "hidden";
   if (mode === "contact") showContact(); else showFrame(i);
@@ -648,7 +705,7 @@ function swapLarge(id, guard, pdf){
 }
 function showContact(){
   const r = current, c = r.contact;
-  $("#lInfo").innerHTML = `<b>Contact sheet</b> · ${esc(r.film)} · ${shortDate(r.date)} ${esc(r.year)}`;
+  $("#lInfo").innerHTML = `<b>Contact sheet</b><span class="lf"> · ${esc(r.film)} · ${shortDate(r.date)} ${esc(r.year)}</span>`;
   $("#lDl").href = DEMO ? "#" : drive.download(c.id);
   lImg.alt = `Contact sheet for ${r.film}`;
   lImg.src = DEMO ? demoImage(c.id, 1800) : (c.type === "pdf" ? drive.thumbAlt(c.id, 1800) : drive.thumb(c.id, 1800));
@@ -659,7 +716,7 @@ function showFrame(i){
   const n = r.photos.length;
   loupeIndex = (i + n) % n;
   const p = r.photos[loupeIndex];
-  $("#lInfo").innerHTML = `<b>${pad(loupeIndex + 1)}</b> / ${pad(n)} · ${esc(r.film)} · ${shortDate(r.date)} ${esc(r.year)}`;
+  $("#lInfo").innerHTML = `<b>${pad(loupeIndex + 1)}</b> / ${pad(n)}<span class="lf"> · ${esc(r.film)} · ${shortDate(r.date)} ${esc(r.year)}</span>`;
   $("#lDl").href = DEMO ? "#" : drive.download(p.id);
   lImg.alt = `Frame ${loupeIndex + 1}, ${r.film}`;
   lImg.src = DEMO ? demoImage(p.id, 640) : drive.thumb(p.id, 640);
