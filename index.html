@@ -86,7 +86,7 @@ button{font:inherit;color:inherit}
   :root:not([data-theme="light"]) .theme .sun{display:none}
   :root:not([data-theme="light"]) .theme .moon{display:block}
 }
-@media (max-width:560px){ .top .meta{display:none} }
+@media (max-width:560px){ .top .meta:not(:has(.owner-pill)){display:none} .top .meta .cnt, .owner-pill .w{display:none} .top-right{gap:10px} .brand small{white-space:nowrap} .owner-pill{padding:4px 8px} }
 
 .demo{
   display:flex; gap:10px; align-items:baseline; flex-wrap:wrap;
@@ -145,6 +145,11 @@ button{font:inherit;color:inherit}
 .r-fr{grid-area:fr; font-family:var(--mono); font-size:var(--step--1); color:var(--muted); text-align:right; font-variant-numeric:tabular-nums}
 .r-go{grid-area:go; color:var(--muted); transition:transform .2s, color .2s}
 .roll:hover .r-go{transform:translateX(3px); color:var(--accent)}
+.vis{display:inline-block; vertical-align:2px; margin-left:8px; font-family:var(--mono); font-size:.625rem; font-weight:500; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); border:1px solid currentColor; border-radius:3px; padding:1px 5px}
+.owner-pill{display:inline-flex; align-items:center; gap:6px; color:var(--accent); border:1px solid currentColor; border-radius:999px; padding:4px 10px; font-size:.6875rem; letter-spacing:.1em; text-transform:uppercase}
+.owner-pill::before{content:""; width:6px; height:6px; border-radius:50%; background:currentColor}
+.share-field{width:100%; font-family:var(--mono); font-size:.75rem; padding:8px 10px; border:1px solid var(--line); border-radius:4px; background:var(--surface); color:var(--ink)}
+.intro.stranger{padding-block:72px 96px}
 .push{font-style:normal; color:var(--accent); margin-left:6px; font-size:.6875rem; border:1px solid currentColor; border-radius:3px; padding:0 4px}
 .empty{padding-block:40px; color:var(--muted)}
 
@@ -429,6 +434,12 @@ let DEMO = false;
 /* A share link (#s-KEY) opens one roll on its own, with no way to browse to the rest. */
 const SHARE_KEY = (/^#s-([A-Za-z0-9]{8,})$/.exec(location.hash) || [])[1] || null;
 const SHARED = !!SHARE_KEY;
+/* The owner link (#o-KEY) shows every roll. The key stays in the address while browsing,
+   so reloading or bookmarking keeps you in owner view; nothing is stored on the device. */
+const OWNER_KEY = SHARED ? null : ((/^#o-([A-Za-z0-9]{16,})(?:~|$)/.exec(location.hash) || [])[1] || null);
+const OWNER = !!OWNER_KEY;
+const rollHref = id => OWNER ? `#o-${OWNER_KEY}~${id}` : `#roll-${id}`;
+const homeHref = () => OWNER ? `#o-${OWNER_KEY}` : "#";
 let isoFilter = "All";
 let current = null;     // roll being viewed
 let loupeIndex = 0;
@@ -466,9 +477,8 @@ function pushLabel(stops){
 /* ---------- Data ---------- */
 async function loadData(){
   if (!CONFIG.DATA_URL) { DEMO = true; return demoData(); }
-  const url = SHARE_KEY
-    ? CONFIG.DATA_URL + (CONFIG.DATA_URL.includes("?") ? "&" : "?") + "k=" + encodeURIComponent(SHARE_KEY)
-    : CONFIG.DATA_URL;
+  const param = SHARE_KEY ? "k=" + encodeURIComponent(SHARE_KEY) : OWNER_KEY ? "o=" + encodeURIComponent(OWNER_KEY) : "";
+  const url = param ? CONFIG.DATA_URL + (CONFIG.DATA_URL.includes("?") ? "&" : "?") + param : CONFIG.DATA_URL;
   try {
     const res = await fetch(url, {redirect:"follow"});
     if (!res.ok) throw new Error(res.status);
@@ -532,7 +542,18 @@ function renderHome(){
   const frames = ROLLS.reduce((n, r) => n + r.photos.length, 0);
   const years = ROLLS.map(r => r.year).filter(y => typeof y === "number");
   const span = years.length ? (Math.min(...years) === Math.max(...years) ? Math.max(...years) : `${Math.min(...years)}–${Math.max(...years)}`) : "";
-  $("#topMeta").textContent = span ? `${ROLLS.length} rolls · ${span}` : "";
+  $("#topMeta").innerHTML = OWNER
+    ? `<span class="cnt">${ROLLS.length} rolls · </span><span class="owner-pill">Owner<span class="w">&nbsp;view</span></span>`
+    : (span ? `${ROLLS.length} rolls · ${span}` : "");
+
+  if (!OWNER && !ROLLS.length) {   // what strangers see at the bare address
+    view.innerHTML = `
+      <section class="wrap intro stranger">
+        <h1>Every roll, <em>frame by frame.</em></h1>
+        <p>Photographs shot on film by Ronan Dsouza. Rolls are shared privately, by link. If you were sent one, open the link you received.</p>
+      </section>`;
+    return;
+  }
 
   const isos = {};
   ROLLS.forEach(r => { const k = isoKey(r); if (k) isos[k] = (isos[k] || 0) + 1; });
@@ -551,7 +572,9 @@ function renderHome(){
   view.innerHTML = `
     <section class="wrap intro">
       <h1>Every roll, <em>frame by frame.</em></h1>
-      <p>Photographs I've shot on film, scanned and kept in one place. Open a roll to see its contact sheet and download any frame at full resolution. No account needed.</p>
+      <p>${OWNER
+        ? "Owner view. Every roll is listed here, including link-only ones. Open a roll to copy its share link."
+        : "Photographs I've shot on film, scanned and kept in one place. Open a roll to see its contact sheet and download any frame at full resolution. No account needed."}</p>
       <div class="stats mono">
         <span><b>${ROLLS.length}</b> rolls</span>
         <span><b>${frames}</b> frames</span>
@@ -571,10 +594,10 @@ function renderHome(){
           <h2>${esc(g.year)}<span>${g.rolls.length} roll${g.rolls.length > 1 ? "s" : ""}</span></h2>
           <ol class="rolls">
             ${g.rolls.map(r => `
-              <li><a class="roll" href="#roll-${esc(r.id)}">
+              <li><a class="roll" href="${rollHref(esc(r.id))}">
                 <span class="r-no">No.&nbsp;${pad(r.no)}</span>
                 <span class="r-date">${shortDate(r.date)}</span>
-                <span class="r-film">${esc(r.film || "Unknown film")}${r.title ? `<em>${esc(r.title)}</em>` : ""}</span>
+                <span class="r-film">${esc(r.film || "Unknown film")}${OWNER && r.visibility === "public" ? `<span class="vis">Public</span>` : ""}${r.title ? `<em>${esc(r.title)}</em>` : ""}</span>
                 <span class="r-iso">${r.iso ? `ISO ${esc(r.iso)}${pushLabel(pushStops(r.film, r.iso))}` : ""}</span>
                 <span class="r-cam">${esc(r.camera)}</span>
                 <span class="r-fr">${r.photos.length} fr</span>
@@ -603,7 +626,7 @@ function renderRoll(r){
 
   view.innerHTML = `
     <div class="wrap">
-      ${SHARED ? "" : `<a class="back" href="#"><span aria-hidden="true">←</span> All rolls</a>`}
+      ${SHARED ? "" : `<a class="back" href="${homeHref()}"><span aria-hidden="true">←</span> All rolls</a>`}
       <header class="roll-head">
         <div>
           <p class="eyebrow mono">${SHARED ? "Shared roll" : `Roll No. ${pad(r.no)}`} · ${longDate(r.date)}</p>
@@ -622,6 +645,9 @@ function renderRoll(r){
                <a class="btn" href="${link(drive.folder(r.id))}" target="_blank" rel="noopener" data-demo-dl>Open in Google Drive</a>`
             : `<a class="btn primary" href="${link(drive.folder(r.id))}" target="_blank" rel="noopener" data-demo-dl>↓ Download whole roll</a>
                <p class="hint">Opens the roll in Google Drive. Use Drive's Download button to get every frame as one zip.</p>`}
+          ${OWNER && r.key ? `
+          <button class="btn" type="button" id="copyShare">Copy share link</button>
+          <p class="hint" id="shareNote">${r.visibility === "public" ? "This roll is also listed on the public home page." : "Link only. Not listed on the public home page."}</p>` : ""}
         </div>
       </header>
 
@@ -657,8 +683,8 @@ function renderRoll(r){
 
       ${SHARED ? "" : `
       <nav class="roll-nav" aria-label="More rolls">
-        ${older ? `<a href="#roll-${esc(older.id)}"><small>← Previous roll · ${shortDate(older.date)} ${older.year}</small><span>${esc(older.film)}</span></a>` : "<span></span>"}
-        ${newer ? `<a href="#roll-${esc(newer.id)}"><small>Next roll · ${shortDate(newer.date)} ${newer.year} →</small><span>${esc(newer.film)}</span></a>` : ""}
+        ${older ? `<a href="${rollHref(esc(older.id))}"><small>← Previous roll · ${shortDate(older.date)} ${older.year}</small><span>${esc(older.film)}</span></a>` : "<span></span>"}
+        ${newer ? `<a href="${rollHref(esc(newer.id))}"><small>Next roll · ${shortDate(newer.date)} ${newer.year} →</small><span>${esc(newer.film)}</span></a>` : ""}
       </nav>`}
     </div>`;
 
@@ -678,6 +704,22 @@ function renderRoll(r){
   });
   view.querySelectorAll(".frame").forEach(b => b.addEventListener("click", () => openLoupe(+b.dataset.i, b, "frames")));
   bindDemoLinks(view);
+  $("#copyShare")?.addEventListener("click", () => copyShareLink(r));
+}
+
+function copyShareLink(r){
+  const link = location.origin + location.pathname + "#s-" + r.key;
+  const showField = () => {
+    let f = $("#shareField");
+    if (!f) {
+      $("#shareNote").insertAdjacentHTML("afterend", `<input class="share-field" id="shareField" readonly aria-label="Share link">`);
+      f = $("#shareField");
+    }
+    f.value = link; f.focus(); f.select();
+  };
+  try {
+    navigator.clipboard.writeText(link).then(() => toast("Share link copied"), () => { showField(); toast("Copy the selected link"); });
+  } catch (_) { showField(); toast("Copy the selected link"); }
 }
 
 /* Justified photo wall: each tile grows in proportion to its photo's width/height. */
@@ -762,7 +804,8 @@ $("#lStage").addEventListener("pointerup", e => {
 function route(){
   if (!loupe.hidden) closeLoupe();
   if (SHARED) return;                       // a shared roll never leads anywhere else
-  if (/^#s-/.test(location.hash)) { location.reload(); return; }
+  const h = location.hash;
+  if (/^#s-/.test(h) || (/^#o-/.test(h) && !h.startsWith("#o-" + OWNER_KEY)) || (OWNER && !/^#o-/.test(h))) { location.reload(); return; }
   routeTo(location.hash);
 }
 document.addEventListener("click", e => {
@@ -775,7 +818,7 @@ document.addEventListener("click", e => {
   routeTo(h);
 });
 function routeTo(h){
-  const m = /^#roll-([\w.~-]+)$/.exec(h);
+  const m = OWNER ? /^#o-[A-Za-z0-9]+~([\w.-]+)$/.exec(h) : /^#roll-([\w.~-]+)$/.exec(h);
   const r = m && ROLLS.find(x => x.id === m[1]);
   if (r) { if (!current) homeScroll = scrollY; renderRoll(r); scrollTo(0, 0); }
   else { const was = !!current; renderHome(); if (was) requestAnimationFrame(() => scrollTo(0, homeScroll)); }
@@ -785,12 +828,13 @@ addEventListener("hashchange", route);
 
 /* ---------- Demo helpers ---------- */
 let toastEl = null, toastT = null;
-function demoToast(){
+function toast(msg){
   if (!toastEl) { toastEl = document.createElement("div"); toastEl.className = "toast"; toastEl.setAttribute("role", "status"); document.body.appendChild(toastEl); }
-  toastEl.textContent = "Sample image. Downloads link to Google Drive once your rolls are connected.";
+  toastEl.textContent = msg;
   toastEl.hidden = false;
   clearTimeout(toastT); toastT = setTimeout(() => toastEl.hidden = true, 3200);
 }
+function demoToast(){ toast("Sample image. Downloads link to Google Drive once your rolls are connected."); }
 function bindDemoLinks(root){
   if (!DEMO) return;
   root.querySelectorAll("[data-demo-dl]").forEach(a => a.addEventListener("click", e => { e.preventDefault(); e.stopPropagation(); demoToast(); }));
@@ -826,7 +870,7 @@ function demoData(){
       date: `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`,
       look, zip: i % 3 === 0 ? "demo-zip" : "",
       contact: i % 5 === 3 ? null : {id:`${id}cs`, type:"image"},
-      key: `demoroll${i}key`, linkOnly: i === 4 || i === 11 || i === 17,
+      key: `demoroll${i}key`, linkOnly: true, visibility: "link",
       photos: Array.from({length:n}, (_, k) => ({id:`${id}f${k}`}))
     });
     t += (22 + Math.floor(rand() * 40)) * 864e5;
@@ -836,6 +880,9 @@ function demoData(){
   if (SHARE_KEY) {
     const r = rolls.find(x => x.key === SHARE_KEY);
     return r ? {updated, shared:true, rolls:[r]} : {shared:true, error:"not_found", rolls:[]};
+  }
+  if (OWNER_KEY) {
+    return OWNER_KEY === "demoownerkey1234" ? {updated, owner:true, rolls} : {owner:true, error:"not_found", rolls:[]};
   }
   return {updated, rolls: rolls.filter(r => !r.linkOnly)};
 }
@@ -974,6 +1021,14 @@ view.innerHTML = `<p class="wrap empty mono">Loading rolls…</p>`;
 loadData().then(data => {
   ROLLS = normalise(data);
   $("#demoNote").hidden = !DEMO;
+  if (OWNER) {
+    if (data.error) {
+      $("#topMeta").textContent = "";
+      view.innerHTML = `<div class="wrap"><p class="empty">This owner link isn't valid any more. Get the current one from your sheet: Film Archive → Show my owner link.</p></div>`;
+      return;
+    }
+    $(".brand").setAttribute("href", homeHref());
+  }
   if (SHARED) {
     const brand = $(".brand");
     brand.removeAttribute("href");
